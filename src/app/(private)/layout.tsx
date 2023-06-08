@@ -10,8 +10,8 @@
 
 
 import { Navbar } from '@/components/layout/navbar/navbar';
-import { Sidebar } from '@/components/layout/navbar/sidebar/sidebar';
-import { SidebarMobile } from '@/components/layout/navbar/sidebar/sidebar-mobile';
+import { Sidebar } from '@/components/layout/sidebar/sidebar';
+import { SidebarMobile } from '@/components/layout/sidebar/sidebar-mobile';
 import { TailwindIndicator } from '@/components/ui/tailwind-indicator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 

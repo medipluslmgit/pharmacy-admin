@@ -2,7 +2,7 @@
 
 import { useSidebarMobile } from '@/hooks/use-sidebar-mobile';
 
-import { Button } from '../../../ui/button';
+import { Button } from '../../ui/button';
 import { BiMenu } from 'react-icons/bi';
 
 const SidebarMobileButton = () => {

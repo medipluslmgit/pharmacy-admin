@@ -2,7 +2,7 @@ import { siteConfig } from '@/lib/site';
 import { NavOptions } from '@/components/layout/navbar/navbar-options';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 
-import SidebarMobileButton from './sidebar/sidebar-mobile-button';
+import SidebarMobileButton from '../sidebar/sidebar-mobile-button';
 import { NavUserMenu } from './navbar-user-menu';
 
 export function Navbar() {
