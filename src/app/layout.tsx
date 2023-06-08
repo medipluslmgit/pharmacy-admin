@@ -1,13 +1,13 @@
 import './globals.css';
 
+import { Analytics } from '@vercel/analytics/react';
 import { Metadata } from 'next';
-
-import { siteConfig } from '@/lib/site';
-import { nunito } from '@/lib/fonts';
-import { cn } from '@/lib/utils';
+import { Toaster } from 'react-hot-toast';
 
 import { Providers } from '@/components/providers/providers';
-import { Toaster } from 'react-hot-toast';
+import { nunito } from '@/lib/fonts';
+import { siteConfig } from '@/lib/site';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: {
@@ -44,6 +44,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           {children}
           <Toaster />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
