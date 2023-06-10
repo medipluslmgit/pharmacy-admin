@@ -1,6 +1,6 @@
 import './globals.css';
 
-import { Analytics } from '@vercel/analytics/react';
+// import { Analytics } from '@vercel/analytics/react';
 import { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
 
@@ -43,8 +43,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <Providers>
           {children}
           <Toaster />
+          {/* <Analytics /> */}
         </Providers>
-        <Analytics />
       </body>
     </html>
   );

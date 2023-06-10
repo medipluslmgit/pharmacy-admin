@@ -1,9 +1,11 @@
-import React from 'react'
+import Counter from '../../../../components/middlewares/counter';
 
 const AdminHomePage = () => {
   return (
-    <div>AdminHomePage</div>
-  )
-}
+    <div>
+      <Counter />
+    </div>
+  );
+};
 
-export default AdminHomePage
+export default AdminHomePage;

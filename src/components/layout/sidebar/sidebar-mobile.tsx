@@ -1,69 +1,46 @@
 'use client';
 
-import * as React from 'react';
-import { DialogContent } from '@radix-ui/react-dialog';
-import {
-  BiCalculator,
-  BiCalendar,
-  BiCreditCard,
-  BiSmile,
-  BiUser,
-} from 'react-icons/bi';
+import React, { useLayoutEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import type { Session } from 'next-auth';
 
 import { useSidebarMobile } from '@/hooks/use-sidebar-mobile';
+
 import {
   CommandDialog,
-  CommandEmpty,
-  CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from '@/components/ui/command';
+import SidebarAdminOptions from './options/admin/sidebar-admin-options';
+import SidebarCashierOptions from './options/cashier/sidebar-cashier-options';
+import SidebarDoctorOptions from './options/doctor/sidebar-doctor-options';
+import SidebarSupervidorOptions from './options/supervidor/sidebar-supervisor-options';
 
-export function SidebarMobile() {
+const sidebars = {
+  admin: SidebarAdminOptions,
+  supervisor: SidebarSupervidorOptions,
+  cashier: SidebarCashierOptions,
+  doctor: SidebarDoctorOptions,
+};
+
+interface SidebarMobileProps {
+  session: Session;
+}
+
+export function SidebarMobile({ session }: SidebarMobileProps) {
   const sidebarMobile = useSidebarMobile();
+
+  const SidebarOptions = sidebars[session.user.role];
+  console.log(SidebarOptions)
 
   return (
     <>
       <CommandDialog
         open={sidebarMobile.isOpen}
         onOpenChange={sidebarMobile.onOpenChange}
-        key="sidebar-mobile"
       >
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList className="max-h-[calc(100vh-66px)]">
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            <CommandItem>
-              <BiCalendar className="mr-2 h-4 w-4" />
-              <span>Calendar</span>
-            </CommandItem>
-            <CommandItem>
-              <BiSmile className="mr-2 h-4 w-4" />
-              <span>Search Emoji</span>
-            </CommandItem>
-            <CommandItem>
-              <BiCalculator className="mr-2 h-4 w-4" />
-              <span>Calculator</span>
-            </CommandItem>
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Settings">
-            <CommandItem>
-              <BiUser className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-              <CommandShortcut>⌘P</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <BiCreditCard className="mr-2 h-4 w-4" />
-              <span>Billing</span>
-              <CommandShortcut>⌘B</CommandShortcut>
-            </CommandItem>
-          </CommandGroup>
-          <CommandEmpty>No results found.</CommandEmpty>
-        </CommandList>
+        <SidebarOptions />
       </CommandDialog>
     </>
   );

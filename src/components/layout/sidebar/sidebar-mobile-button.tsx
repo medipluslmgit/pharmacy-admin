@@ -9,9 +9,11 @@ const SidebarMobileButton = () => {
   const sidebarMobile = useSidebarMobile();
 
   return (
-    <Button className="md:hidden" onClick={sidebarMobile.onOpen}>
-      <BiMenu />
-    </Button>
+    <div>
+      <Button className="md:hidden ml-2" onClick={sidebarMobile.onOpen}>
+        <BiMenu />
+      </Button>
+    </div>
   );
 };
 
