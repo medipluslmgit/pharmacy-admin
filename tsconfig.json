@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/layout/navbar/navbar-logo.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/layout/navbar/navbar-logo.tsx", "src/app/(private)/(by-role)/admin/product/money-invested/page.tsxold"],
   "exclude": ["node_modules"]
 }

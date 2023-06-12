@@ -17,9 +17,10 @@ interface UnlogguedProps {
 
 const Unloggued = async (props: UnlogguedProps) => {
   const session = await getServerSession(authOptions);
-
+  
   if (session?.user) {
-    redirect(appByRole[session.user.role] || '/no-role');
+    const sessionRole = session.user.role as unknown as keyof typeof appByRole;
+    redirect(appByRole[sessionRole] || '/no-role');
   }
 
   return <>{props.children}</>;

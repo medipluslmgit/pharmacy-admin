@@ -29,8 +29,8 @@ interface SidebarMobileProps {
 
 export function SidebarMobile({ session }: SidebarMobileProps) {
   const sidebarMobile = useSidebarMobile();
-
-  const SidebarOptions = sidebars[session.user.role];
+  const sessionRole = session.user.role as unknown as keyof typeof sidebars;
+  const SidebarOptions = sidebars[sessionRole];
   console.log(SidebarOptions)
 
   return (

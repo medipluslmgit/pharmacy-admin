@@ -17,7 +17,8 @@ interface SidebarProps {
 }
 
 export async function Sidebar({ session }: SidebarProps) {
-  const sidebarOptions = sidebars[session.user.role];
+  const sessionRole = session.user.role as unknown as keyof typeof sidebars;
+  const sidebarOptions = sidebars[sessionRole];
 
   return (
     <>

@@ -21,9 +21,9 @@ const LogguedApp = async ({ children }: LogguedAppProps) => {
   }
 
   console.log('session', session);
-  
 
-  redirect(appByRole[session.user.role]);
+  const sessionRole = session.user.role as unknown as keyof typeof appByRole;
+  redirect(appByRole[sessionRole]);
 };
 
 export default LogguedApp;
