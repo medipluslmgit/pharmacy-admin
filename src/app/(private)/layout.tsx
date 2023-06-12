@@ -24,14 +24,13 @@ export default async function PrivateLayout({ children }: RootLayoutProps) {
 
   return (
     <>
-      <div className="relative flex flex-col ">
+      <div className="relative flex flex-col">
         <Navbar />
 
-        <div className="flex h-5/6 flex-row overflow-hidden">
+        <div className="flex h-5/6 flex-row">
           <Sidebar session={session} />
 
           <ScrollArea className="h-5/6 flex-1 shadow-inner">
-            {session.user.role}
             {children}
           </ScrollArea>
         </div>

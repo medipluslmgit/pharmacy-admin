@@ -20,12 +20,15 @@ export async function Sidebar({ session }: SidebarProps) {
   const sidebarOptions = sidebars[session.user.role];
 
   return (
-    <Command
-      id="carmen"
-      className="hidden h-[calc(100vh-66px)] max-w-[300px] md:block shadow-md border-r"
-    >
-      <CommandInput placeholder="Type a command or search..." />
-      {sidebarOptions}
-    </Command>
+    <>
+      <div className="hidden h-[calc(100vh-66px)] max-w-[300px] w-[300px] md:block shadow-md border-r"></div>
+      <Command
+        id="carmen"
+        className="hidden h-[calc(100vh-66px)] fixed max-w-[300px] md:block shadow-md border-r"
+      >
+        <CommandInput placeholder="Type a command or search..." />
+        {sidebarOptions}
+      </Command>
+    </>
   );
 }

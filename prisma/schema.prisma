@@ -13,22 +13,51 @@ enum UserRole {
   admin
   supervisor
   cashier
+  counter
+  customer
 }
 
 model User {
   id             String    @id @default(cuid())
-  userName       String   @unique
+  userName       String    @unique
   hashedPassword String
   role           UserRole
   email          String?   @unique
   name           String?
   emailVerified  DateTime?
   image          String?
-  
-  accounts       Account[]
+  phone          String?
+  lat            Float? // Direction
+  lng            Float? // Direction
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Employee
+  nss            String?
+  rfc            String?
+  salary         Float?
+  birthday       DateTime?
+  branchOfficeId String?
+  branchOffice   BranchOffice? @relation(fields: [branchOfficeId], references: [id])
+
+  // Doctor
+  cedula String?
+
+  // Relations
+  accounts Account[]
+  products Product[]
+
+  createdOrders  PuchaseOrder[] @relation("createdBy")
+  finishedOrders PuchaseOrder[] @relation("finishedBy")
+
+  createdTickets  Ticket[]  @relation("createdBy")
+  updatedTickets  Ticket[]  @relation("updatedBy")
+  puchasedTickets Ticket[]  @relation("purchasedBy")
+  Credits         Credits[]
 
   @@index([userName])
   @@index([email])
+  @@index([branchOfficeId])
 }
 
 model Account {
@@ -50,241 +79,293 @@ model Account {
   @@index([userId])
 }
 
-// --------------------------------------
-
-model branch_office {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique(map: "IDX_ed90edcfa924ec9ec45da7c66d") @db.VarChar(99)
-  description String?  @db.VarChar(455)
-  phones      String?  @db.Text
-  location    String?  @db.Text
-  createdAt   DateTime @default(now()) @db.DateTime(0)
-  status      String   @default("PLANNING") @db.VarChar(255)
+enum BranchOfficeStatus {
+  planning
+  active
+  inactive
 }
 
-model branch_offices_social_network {
-  id             Int      @id @default(autoincrement())
-  name           String   @db.VarChar(99)
-  url            String   @db.VarChar(99)
-  createdAt      DateTime @default(now()) @db.DateTime(0)
-  branchOfficeId Int?
+model BranchOffice {
+  id          String             @id @default(cuid())
+  name        String
+  description String?
+  lat         Float?
+  lng         Float?
+  phone       String?
+  createdAt   DateTime           @default(now())
+  status      BranchOfficeStatus @default(planning)
 
-  @@index([branchOfficeId], map: "FK_78b399828f0e3e9696a084c837e")
+  users        User[]
+  PuchaseOrder PuchaseOrder[]
+  Ticket       Ticket[]
 }
 
-model customer {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(99)
-  email     String   @db.VarChar(99)
-  password  String   @db.VarChar(99)
-  status    String   @default("ACTIVE") @db.VarChar(30)
-  createdAt DateTime @default(now()) @db.DateTime(6)
-  updatedAt DateTime @default(now()) @db.DateTime(6)
+enum ProductCategoryStatus {
+  active
+  inactive
 }
 
-model customer_payment {
-  id            Int      @id @default(autoincrement())
-  status        String   @db.VarChar(99)
-  paymentMethod String   @default("PENDING") @db.VarChar(99)
-  terminalFolio String?  @db.VarChar(99)
-  createdAt     DateTime @default(now()) @db.DateTime(6)
-  updatedAt     DateTime @default(now()) @db.DateTime(6)
-  ticketId      Int?
+model ProductCategory {
+  id          String                @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  status      ProductCategoryStatus @default(active)
 
-  @@index([ticketId], map: "FK_63be1766147cd736b83171fb979")
+  products Product[]
 }
 
-model customer_payment_files {
-  id                Int      @id @default(autoincrement())
-  key               String   @db.VarChar(99)
-  url               String   @db.VarChar(99)
-  bucket            String   @db.VarChar(99)
-  createdAt         DateTime @default(now()) @db.DateTime(6)
-  customerPaymentId Int?
+model ProductForm {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([customerPaymentId], map: "FK_63066ecc4811929adbc654cb552")
+  products Product[]
 }
 
-model doctor {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(99)
-  cedula      String   @unique(map: "IDX_1f041d13554c7cfb78b0f19338") @db.VarChar(99)
-  email       String   @db.VarChar(99)
-  phone       String   @db.VarChar(99)
-  status      String   @default("ACTIVE") @db.VarChar(99)
-  createdById Int?
-  createdAt   DateTime @default(now()) @db.DateTime(6)
+model ProductAdministrationWay {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([createdById], map: "FK_9666cee310191458bdcaeee6ab7")
+  products Product[]
 }
 
-model employee {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(99)
-  lastName  String    @db.VarChar(99)
-  birthday  DateTime? @db.DateTime(0)
-  email     String    @unique(map: "IDX_817d1d427138772d47eca04885") @db.VarChar(99)
-  phone     String    @default("") @db.VarChar(24)
-  password  String    @db.VarChar(99)
-  nss       String    @unique(map: "IDX_b1f0d0f4934d7fc79deefc48f0") @db.VarChar(99)
-  rfc       String    @unique(map: "IDX_0f07d2611dc4cbef1a5d18e673") @db.VarChar(99)
-  salary    Float     @db.Float
-  status    String    @default("ACTIVE") @db.VarChar(255)
-  createdAt DateTime  @default(now()) @db.DateTime(0)
+enum ProductStatus {
+  active
+  inactive
 }
 
-model employee_branch_office_Role {
-  id             Int      @id @default(autoincrement())
-  role           String   @db.VarChar(255)
-  createdAt      DateTime @default(now()) @db.DateTime(6)
-  updatedAt      DateTime @default(now()) @db.DateTime(6)
-  employeeId     Int?
-  branchOfficeId Int?
-
-  @@index([branchOfficeId], map: "FK_b8a3bc51bccbb528a7a4b005e7e")
-  @@index([employeeId], map: "FK_f6a78935eaa95e6f7ea3ea901e6")
-}
-
-model employee_images {
-  id         Int      @id @default(autoincrement())
-  key        String   @db.VarChar(99)
-  bucket     String   @db.VarChar(99)
-  createdAt  DateTime @default(now()) @db.DateTime(0)
-  updatedAt  DateTime @default(now()) @db.DateTime(6)
-  employeeId Int?     @unique(map: "REL_d483b5ad334428184327b33ecb")
-}
-
-model product {
-  id                  Int      @id @default(autoincrement())
-  name                String   @db.VarChar(99)
-  description         String   @db.VarChar(455)
-  administrationWay   String   @db.VarChar(99)
-  gtin                String   @unique(map: "IDX_85bd0246bfcc1b71cfff40f29b") @db.VarChar(99)
-  laboratory          String   @db.VarChar(99)
-  category            String   @db.VarChar(99)
-  productForm         String   @db.VarChar(99)
-  isControlledProduct Int      @default(0) @db.TinyInt
-  isAntibiotic        Int      @default(0) @db.TinyInt
-  isRefrigerated      Int      @default(0) @db.TinyInt
-  group               Int
-  createdAt           DateTime @default(now()) @db.DateTime(6)
-  updatedAt           DateTime @default(now()) @db.DateTime(6)
-  status              String   @default("ACTIVE") @db.VarChar(99)
-  createdById         Int?
+model Product {
+  id                  String         @id @default(cuid())
+  name                String
+  description         String
+  gtin                String         @unique
+  laboratory          String?
   isGeneric           Int
+  group               Int            @default(0)
+  isControlledProduct Boolean?
+  isAntibiotic        Boolean?
+  isRefrigerated      Boolean?
+  status              ProductStatus  @default(active)
+  productImages       ProductImage[]
+  createdAt           DateTime       @default(now()) @db.DateTime(6)
+  updatedAt           DateTime       @default(now()) @db.DateTime(6)
 
-  @@index([createdById], map: "FK_806302f2d4da2a0c27eedbf34fe")
+  // Sale Data
+  pharmacyPrice Float?
+  clinicPrice   Float?
+  websitePrice  Float?
+  stock         Int    @default(0)
+
+  createdById          String?
+  createdBy            User?                    @relation(fields: [createdById], references: [id])
+  productCategoryId    String
+  productCategory      ProductCategory          @relation(fields: [productCategoryId], references: [id])
+  productFormId        String
+  productForm          ProductForm              @relation(fields: [productFormId], references: [id])
+  administrationWay    String
+  administration       ProductAdministrationWay @relation(fields: [administrationWay], references: [id])
+  purchaseORderProduct PurchaseOrderProduct[]
+  productExpiration    ProductExpiration[]
+  ticketItems          TicketItems[]
+
+  @@index([productCategoryId])
+  @@index([productFormId])
+  @@index([administrationWay])
+  @@index([createdById])
 }
 
-model product_images {
-  id        Int      @id @default(autoincrement())
-  key       String   @db.VarChar(99)
-  url       String   @db.VarChar(99)
-  bucket    String   @db.VarChar(99)
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String  @db.VarChar(99)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+}
+
+enum ProviderStatus {
+  active
+  inactive
+}
+
+model Provider {
+  id          String         @id @default(cuid())
+  name        String
+  rfc         String
+  contactName String?
+  email       String?
+  phone       String?
+  status      ProviderStatus @default(active)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  PuchaseOrder PuchaseOrder[]
+}
+
+enum PurchaseOrderPaymentType {
+  credit
+  cash
+}
+
+enum PurchaseOrderStatus {
+  planning
+  requested
+  confirmed
+  canceled
+  finished
+}
+
+model PuchaseOrder {
+  id          String                   @id @default(cuid())
+  paymentType PurchaseOrderPaymentType @default(cash)
+  status      PurchaseOrderStatus
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  products    PurchaseOrderProduct[]
+
+  providerId     String
+  provider       Provider     @relation(fields: [providerId], references: [id])
+  branchOfficeId String
+  branchOffice   BranchOffice @relation(fields: [branchOfficeId], references: [id])
+  createdById    String
+  createdBy      User         @relation(fields: [createdById], references: [id], name: "createdBy")
+  finishedById   String?
+  finishedBy     User?        @relation(fields: [finishedById], references: [id], name: "finishedBy")
+
+  @@index([providerId])
+  @@index([branchOfficeId])
+  @@index([createdById])
+  @@index([finishedById])
+}
+
+model PurchaseOrderProduct {
+  id             String   @id @default(cuid())
+  expirationDate DateTime @default(now()) @db.DateTime(0)
+  units          Int
+
+  purchasePricing Float
+  subTotal        Float
+
+  pharmacyPricing Float
+  websitePricing  Float
+  clinicPricing   Float
+  maxPricing      Float
+
   createdAt DateTime @default(now()) @db.DateTime(6)
-  productId Int?
+  updatedAt DateTime @updatedAt
 
-  @@index([productId], map: "FK_b367708bf720c8dd62fc6833161")
+  productId         String?
+  product           Product?            @relation(fields: [productId], references: [id])
+  purchaseOrderId   String?
+  purchaseOrder     PuchaseOrder?       @relation(fields: [purchaseOrderId], references: [id])
+  productExpiration ProductExpiration[]
+
+  @@index([productId])
+  @@index([purchaseOrderId])
 }
 
-model product_stock {
-  id                     Int      @id @default(autoincrement())
-  maxPricing             Float
-  pharmacyPricing        Float
-  webPricing             Float
-  clinicPricing          Float
-  status                 String   @default("FOR_SALE") @db.VarChar(99)
-  lastStatusUpdated      String?  @db.VarChar(99)
-  createdAt              DateTime @default(now()) @db.DateTime(6)
-  updatedAt              DateTime @default(now()) @db.DateTime(6)
-  branchOfficeId         Int?
-  purchaseOrderProductId Int?
-  productId              Int?
-  expirationDate         DateTime @default(now()) @db.DateTime(0)
-  createdById            Int?
-  ticketId               Int?
-  soldPrice              Float?
-
-  @@index([branchOfficeId], map: "FK_02f037c04afd19ab8b4f16a5fed")
-  @@index([purchaseOrderProductId], map: "FK_2a313522cf78b7d9776f8ac1b37")
-  @@index([createdById], map: "FK_4802a3b01ebc559310488f1725b")
-  @@index([ticketId], map: "FK_6c6ff2de8f68a2e52b0644816b7")
-  @@index([productId], map: "FK_6d782c52c11043659e1182b33db")
-}
-
-model provider {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(99)
-  rfc         String   @db.VarChar(99)
-  contactName String   @db.VarChar(99)
-  email       String   @db.VarChar(99)
-  phone       String   @unique(map: "IDX_180b6be5beacd40f723d2cae38") @db.VarChar(99)
-  website     String?  @db.VarChar(99)
-  status      String   @db.VarChar(99)
-  createdAt   DateTime @default(now()) @db.DateTime(6)
-}
-
-model purchase_order {
-  id             Int      @id @default(autoincrement())
-  paymentType    String   @default("CREDIT_PAYMENT") @db.VarChar(255)
-  status         String   @default("REQUESTED") @db.VarChar(255)
+model ProductExpiration {
+  id             String   @id @default(cuid())
+  expirationDate DateTime
+  units          Int
   createdAt      DateTime @default(now()) @db.DateTime(6)
-  updatedAt      DateTime @default(now()) @db.DateTime(6)
-  providerId     Int?
-  branchOfficeId Int?
-  createdById    Int?
+  updatedAt      DateTime @updatedAt
 
-  @@index([createdById], map: "FK_2947cfdfcc6ba31b0a0dc1dab83")
-  @@index([branchOfficeId], map: "FK_904aceed9ace2219b6662a22d07")
-  @@index([providerId], map: "FK_f6d984cb5194e9525fd46503f2c")
+  purchaseOrderProductId String?
+  purchaseOrderProduct   PurchaseOrderProduct? @relation(fields: [purchaseOrderProductId], references: [id])
+  productId              String?
+  product                Product?              @relation(fields: [productId], references: [id])
+
+  @@index([purchaseOrderProductId])
+  @@index([productId])
 }
 
-model purchase_order_product {
-  id                     Int      @id @default(autoincrement())
-  createdAt              DateTime @default(now()) @db.DateTime(6)
-  updatedAt              DateTime @default(now()) @db.DateTime(6)
-  purchaseOrderId        Int?
-  productId              Int?
-  expirationDate         DateTime @default(now()) @db.DateTime(0)
-  units                  Float
-  purchasePricingPerUnit Float
-  purchaseTotalPricing   Float
-  pharmacySalePricing    Float
-  websiteSalePricing     Float
-  clinicSalePricing      Float
-  maximumSalePricing     Float
-
-  @@index([productId], map: "FK_43879f15e54d727da472c2a88c2")
-  @@index([purchaseOrderId], map: "FK_a8ae2c6a0da47c81638d7f4f162")
+enum TicketOrigin {
+  pharmacy
+  website
 }
 
-model ticket {
-  id             Int      @id @default(autoincrement())
-  origin         String   @default("PHARMACY") @db.VarChar(99)
-  status         String   @default("OPEN") @db.VarChar(99)
-  createdAt      DateTime @default(now()) @db.DateTime(6)
-  updatedAt      DateTime @default(now()) @db.DateTime(6)
-  customerId     Int?
-  branchOfficeId Int?
-  createdById    Int?
-  terminalFolio  String?  @db.VarChar(255)
-  paymentMethod  String   @default("CASH") @db.VarChar(255)
-  doctorId       Int?
-  updatedById    Int?
-
-  @@index([branchOfficeId], map: "FK_81c22fab8ee24544d9e9c05710b")
-  @@index([customerId], map: "FK_8932781487db15d1393b206482e")
-  @@index([createdById], map: "FK_cdd21a6b9c9d8ccb0de1c695e7e")
-  @@index([doctorId], map: "FK_f30f1c493d3f9f254f5e10ddaf0")
-  @@index([updatedById], map: "FK_fe77acf2f45e295c3b301d97a2c")
+enum TicketStatus {
+  open
+  canceled
+  closed
 }
 
-model ticket_item {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now()) @db.DateTime(6)
-  ticketId       Int?
-  productStockId Int?
+model Ticket {
+  id            String       @id @default(cuid())
+  origin        TicketOrigin @default(pharmacy)
+  status        TicketStatus @default(open)
+  terminalFolio String?      @db.VarChar(255)
+  paymentMethod String       @default("CASH") @db.VarChar(255)
+  doctorId      Int?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-  @@index([ticketId], map: "FK_5ec69cdb2d87cb6eeee2b6cecf8")
-  @@index([productStockId], map: "FK_efedb1df9f04b7cd086122aa077")
+  branchOfficeId String
+  branchOffice   BranchOffice @relation(fields: [branchOfficeId], references: [id])
+
+  createdById   String
+  createdBy     User          @relation(fields: [createdById], references: [id], name: "createdBy")
+  updatedById   String?
+  updatedBy     User?         @relation(fields: [updatedById], references: [id], name: "updatedBy")
+  purchasedById String?
+  purchasedBy   User?         @relation(fields: [purchasedById], references: [id], name: "purchasedBy")
+  ticketItems   TicketItems[]
+
+  @@index([updatedById])
+  @@index([createdById])
+  @@index([branchOfficeId])
+  @@index([purchasedById])
+}
+
+model TicketItems {
+  id        String @id @default(cuid())
+  quantity  Int
+  soldPrice Float
+  subtotal  Float
+
+  ticketId  String
+  ticket    Ticket  @relation(fields: [ticketId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([ticketId])
+  @@index([productId])
+}
+
+enum CreditStatus {
+  pending
+  paid
+}
+
+model Credits {
+  id             String          @id @default(cuid())
+  amount         Float
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  expirationDate DateTime
+  status         CreditStatus    @default(pending)
+  creditPayments CreditPayment[]
+
+  debtorId String
+  debtor   User   @relation(fields: [debtorId], references: [id])
+
+  @@index([debtorId])
+}
+
+model CreditPayment {
+  id        String   @id @default(cuid())
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creditId String
+  credit   Credits @relation(fields: [creditId], references: [id])
+
+  @@index([creditId])
 }

@@ -3,6 +3,7 @@
 import { FC } from 'react';
 import { ThemeProvider } from './theme-provider';
 import SessionProvider from './session-provider';
+import { TooltipProvider } from '../ui/tooltip';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -11,7 +12,9 @@ interface ProvidersProps {
 export const Providers: FC<ProvidersProps> = ({ children }) => {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SessionProvider>{children}</SessionProvider>
+      <TooltipProvider>
+        <SessionProvider>{children}</SessionProvider>
+      </TooltipProvider>
     </ThemeProvider>
   );
 };
