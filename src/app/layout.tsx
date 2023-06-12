@@ -5,7 +5,6 @@ import { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
 
 import { Providers } from '@/components/providers/providers';
-import { nunito } from '@/lib/fonts';
 import { siteConfig } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
@@ -34,12 +33,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es" suppressHydrationWarning>
       <head />
-      <body
-        className={cn(
-          'min-h-screen bg-background font-sans antialiased',
-          nunito.className
-        )}
-      >
+      <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         <Providers>
           {children}
           <Toaster />

@@ -18,6 +18,7 @@ export default async function IndexPage() {
     <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
       <PageTitle
         title={`Hola ${session.user.name}`}
+        // @ts-ignore
         subtitle={subtitles[session.user.role]}
       />
 
