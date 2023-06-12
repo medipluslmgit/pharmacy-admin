@@ -16,7 +16,7 @@ import TableRow from './components/table-row';
 import { LIMIT } from './constants';
 import { Card, CardContent } from '@/components/ui/card';
 
-const API_URL = `http://localhost:5500`;
+const API_URL = process.env.API_URL || `http://localhost:5500`;
 
 type Props = {
   searchParams?: {
