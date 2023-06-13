@@ -134,7 +134,7 @@ const MedicinesListPage = async (req: Props) => {
   }
 
   return (
-    <div className="container mt-4 flex flex-col gap-8 mb-8">
+    <div className="container mt-4 flex flex-col gap-8 mb-8 max-w-[95vw] overflow-x-auto">
       <Breadcrumbs
         breadcrumbs={[
           { href: '/doctor', label: 'Inicio' },
@@ -151,7 +151,7 @@ const MedicinesListPage = async (req: Props) => {
 
       <Card>
         <CardContent>
-          <Table className="text-md">
+          <Table className="text-md overflow-x-auto max-w-[60vw]">
             <TableHeader>
               <TR>
                 <TableHead label="Name" orderBy="name" />
@@ -162,7 +162,7 @@ const MedicinesListPage = async (req: Props) => {
               </TR>
             </TableHeader>
 
-            <TableBody>
+            <TableBody style={{ maxWidth: '100vw', overflowX: 'auto' }}>
               {medicines.items.map((medicine) => (
                 <TableRow key={medicine.gtin} {...medicine} />
               ))}
